@@ -6,8 +6,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from src.pipelines.rag import answer, ingest_pdf
-from src.retrieval.retriever import collection_count
+from ai.pipelines.rag import answer, ingest_pdf
+from ai.retrieval.retriever import collection_count
 
 logger = logging.getLogger(__name__)
 

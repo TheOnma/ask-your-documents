@@ -2,7 +2,7 @@
 
 import logging
 
-from src.config import settings
+from ai.config import settings
 
 logger = logging.getLogger(__name__)
 

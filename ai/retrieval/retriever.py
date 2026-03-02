@@ -6,7 +6,7 @@ import chromadb
 from chromadb.config import Settings as ChromaSettings
 from rank_bm25 import BM25Okapi
 
-from src.config import settings
+from ai.config import settings
 
 logger = logging.getLogger(__name__)
 

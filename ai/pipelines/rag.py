@@ -5,11 +5,11 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from src.config import settings
-from src.ingestion.chunker import chunk_pages
-from src.ingestion.embedder import embed_chunks, embed_texts
-from src.ingestion.loader import load_pdf, load_pdfs_from_dir
-from src.retrieval.retriever import add_chunks, retrieve
+from ai.config import settings
+from ai.ingestion.chunker import chunk_pages
+from ai.ingestion.embedder import embed_chunks, embed_texts
+from ai.ingestion.loader import load_pdf, load_pdfs_from_dir
+from ai.retrieval.retriever import add_chunks, retrieve
 
 logger = logging.getLogger(__name__)
 
