@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from ai.pipelines.rag import answer, ingest_pdf
-from ai.retrieval.retriever import collection_count
+from ai.retrieval.retriever import collection_count, list_sources
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,12 @@ class StatusResponse(BaseModel):
 def health():
     """Check service health and collection size."""
     return {"status": "ok", "total_chunks": collection_count()}
+
+
+@app.get("/documents")
+def documents():
+    """List all ingested document names."""
+    return {"documents": list_sources()}
 
 
 @app.post("/ingest", response_model=IngestResponse)
