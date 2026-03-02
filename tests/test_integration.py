@@ -11,11 +11,11 @@ Run:
 import pytest
 from pathlib import Path
 
-import src.retrieval.retriever as retriever_module
-from src.config import settings
-from src.ingestion.loader import load_pdf
-from src.pipelines.rag import answer, ingest_pdf
-from src.retrieval.retriever import collection_count
+import ai.retrieval.retriever as retriever_module
+from ai.config import settings
+from ai.ingestion.loader import load_pdf
+from ai.pipelines.rag import answer, ingest_pdf
+from ai.retrieval.retriever import collection_count
 
 FIXTURE_PDF = Path(__file__).parent / "fixtures" / "sample.pdf"
 TEST_COLLECTION = "test_documents"

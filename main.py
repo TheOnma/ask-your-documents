@@ -28,12 +28,12 @@ logging.basicConfig(
 
 def serve():
     import uvicorn
-    uvicorn.run("src.api.routes:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("backend.routes:app", host="0.0.0.0", port=8000, reload=True)
 
 
 def ingest(path: str):
     from pathlib import Path
-    from src.pipelines.rag import ingest_directory, ingest_pdf
+    from ai.pipelines.rag import ingest_directory, ingest_pdf
     p = Path(path)
     if p.is_dir():
         n = ingest_directory(p)
@@ -44,11 +44,11 @@ def ingest(path: str):
 
 
 def ask(question: str, show_context: bool = False):
-    from src.pipelines.rag import answer
+    from ai.pipelines.rag import answer
     result = answer(question)
 
     if show_context and result["sources"]:
-        from src.retrieval.retriever import _get_collection
+        from ai.retrieval.retriever import _get_collection
         collection = _get_collection()
         print("\n--- Retrieved Context ---")
         for i, source in enumerate(result["sources"], 1):
