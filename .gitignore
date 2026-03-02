@@ -14,5 +14,7 @@ __pycache__/
 data/chroma/
 data/documents/
 *.pdf
+!tests/fixtures/*.pdf
+evals/results.json
 .venv/
 venv/
