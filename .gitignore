@@ -1,11 +1,6 @@
 # Secrets
 .env
 
-# Claude
-CLAUDE.md
-CLAUDE\ \(1\).md
-.claude/
-
 # Python
 __pycache__/
 *.pyc
