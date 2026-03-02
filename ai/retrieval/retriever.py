@@ -171,3 +171,12 @@ def retrieve(query_embedding: list[float], query_text: str = "", top_k: int | No
 def collection_count() -> int:
     """Return the number of documents in the collection."""
     return _get_collection().count()
+
+
+def list_sources() -> list[str]:
+    """Return a sorted list of unique source document names in the collection."""
+    collection = _get_collection()
+    if collection.count() == 0:
+        return []
+    result = collection.get(include=["metadatas"])
+    return sorted({m["source"] for m in result["metadatas"] if m.get("source")})
