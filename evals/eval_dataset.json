@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ai_001",
+    "document": "AI Engineering Guidebook.pdf",
+    "question": "What are the key components of a RAG pipeline?",
+    "expected_answer_keywords": ["retrieval", "generation", "embedding", "vector", "augmented"],
+    "expected_source_page": null,
+    "notes": "Tests retrieval of core RAG architecture concepts. Answer may span multiple pages."
+  },
+  {
+    "id": "ai_002",
+    "document": "AI Engineering Guidebook.pdf",
+    "question": "What are the LLM fine-tuning techniques?",
+    "expected_answer_keywords": ["fine-tuning", "lora", "training", "model", "parameters"],
+    "expected_source_page": null,
+    "notes": "Tests retrieval of fine-tuning techniques section."
+  },
+  {
+    "id": "ai_003",
+    "document": "AI Engineering Guidebook.pdf",
+    "question": "What is the difference between RAG and fine-tuning?",
+    "expected_answer_keywords": ["retrieval", "fine-tuning", "knowledge", "training", "documents"],
+    "expected_source_page": null,
+    "notes": "Tests synthesis across two related concepts."
+  },
+  {
+    "id": "law_001",
+    "document": "International Law Handbook.pdf",
+    "question": "What does Article 1 in Convention on Special Missions say?",
+    "expected_answer_keywords": ["special mission", "state", "sending", "receiving", "article"],
+    "expected_source_page": 201,
+    "notes": "Tests specific article retrieval with known page number."
+  },
+  {
+    "id": "law_002",
+    "document": "International Law Handbook.pdf",
+    "question": "What is the principle of sovereign equality of states?",
+    "expected_answer_keywords": ["sovereign", "equality", "state", "rights", "international"],
+    "expected_source_page": null,
+    "notes": "Tests retrieval of a fundamental international law concept."
+  },
+  {
+    "id": "off_topic_001",
+    "document": "AI Engineering Guidebook.pdf",
+    "question": "What is the boiling point of tungsten?",
+    "expected_answer_keywords": ["don't have enough information", "not in the context", "cannot answer"],
+    "expected_source_page": null,
+    "notes": "Tests that the pipeline correctly declines off-topic questions. Keywords match the fallback phrase."
+  }
+]
