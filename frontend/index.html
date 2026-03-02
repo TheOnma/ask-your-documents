@@ -298,6 +298,57 @@
     uploadStatus.className = type;
   }
 
+  // ── Chat logic ──
+  const chat = document.getElementById('chat');
+  const questionInput = document.getElementById('question-input');
+  const askBtn = document.getElementById('ask-btn');
+
+  askBtn.addEventListener('click', submitQuestion);
+
+  function appendBubble(role, html) {
+    const div = document.createElement('div');
+    div.className = `bubble ${role}`;
+    div.innerHTML = html;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+
+  async function submitQuestion() {
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    questionInput.value = '';
+    appendBubble('user', `<div class="sender">You</div>${escHtml(question)}`);
+
+    try {
+      const res = await fetch(`${API}/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Request failed');
+
+      let html = `<div class="sender">AI</div>${escHtml(data.answer)}`;
+      if (data.context_found && data.sources.length) {
+        const tags = data.sources
+          .map(s => `<span>${escHtml(s.source)} p.${s.page} (${s.score})</span>`)
+          .join('');
+        html += `<div class="sources"><strong>Sources:</strong><br>${tags}</div>`;
+      }
+      appendBubble('ai', html);
+    } catch (err) {
+      appendBubble('ai', `<div class="sender">AI</div><em style="color:#dc2626">${escHtml(err.message)}</em>`);
+    }
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   async function refreshChunkCount() {
     try {
       const res = await fetch(`${API}/health`);
