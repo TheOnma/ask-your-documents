@@ -389,6 +389,18 @@
       document.getElementById('chunk-count').textContent = 'unavailable';
     }
   }
+
+  // Enter key submits question
+  questionInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitQuestion();
+    }
+  });
+
+  // Greet on load and fetch chunk count
+  appendBubble('ai', '<div class="sender">AI</div>Hello! Upload a PDF and ask me anything about it.');
+  refreshChunkCount();
 </script>
 </body>
 </html>
