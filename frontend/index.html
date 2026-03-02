@@ -26,10 +26,9 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      height: 100dvh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     /* ── Header ── */
@@ -145,12 +144,10 @@
 
     /* ── Chat area ── */
     #chat {
-      flex: 1;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      padding-bottom: 0.5rem;
+      padding-bottom: 1rem;
     }
 
     .bubble {
@@ -203,7 +200,7 @@
     /* ── Input bar ── */
     #input-bar {
       background: var(--surface);
-      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
       padding: 0.85rem 0;
       display: flex;
       gap: 0.6rem;
@@ -260,7 +257,6 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       max-width: 760px;
       width: 100%;
       margin: 0 auto;
@@ -292,12 +288,12 @@
       <span class="empty-hint">No documents uploaded yet.</span>
     </div>
 
-    <div id="chat"></div>
-
     <div id="input-bar">
       <input id="question-input" type="text" placeholder="Ask a question about your documents…" autocomplete="off" />
       <button id="ask-btn" type="button">Ask →</button>
     </div>
+
+    <div id="chat"></div>
   </main>
 
 <script>
