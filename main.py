@@ -4,8 +4,11 @@ Entry points:
   # Start the API server
   python main.py serve
 
-  # Ingest a PDF from the command line
+  # Ingest a single PDF
   python main.py ingest path/to/doc.pdf
+
+  # Ingest all PDFs in a directory
+  python main.py ingest path/to/documents/
 
   # Ask a question from the command line
   python main.py ask "What is the document about?"
@@ -29,9 +32,15 @@ def serve():
 
 
 def ingest(path: str):
-    from src.pipelines.rag import ingest_pdf
-    n = ingest_pdf(path)
-    print(f"Ingested {n} chunks from {path}")
+    from pathlib import Path
+    from src.pipelines.rag import ingest_directory, ingest_pdf
+    p = Path(path)
+    if p.is_dir():
+        n = ingest_directory(p)
+        print(f"Ingested {n} chunks from directory {path}")
+    else:
+        n = ingest_pdf(p)
+        print(f"Ingested {n} chunks from {path}")
 
 
 def ask(question: str, show_context: bool = False):
