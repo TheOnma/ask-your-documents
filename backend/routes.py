@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from ai.pipelines.rag import answer, ingest_pdf
@@ -12,6 +13,13 @@ from ai.retrieval.retriever import collection_count
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Document Q&A", description="RAG-powered document question answering")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # --- Request / Response models ---
