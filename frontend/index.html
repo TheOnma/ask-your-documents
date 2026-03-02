@@ -66,6 +66,44 @@
       background: #22c55e;
     }
 
+    /* ── Upload zone ── */
+    #upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      flex-shrink: 0;
+    }
+
+    #upload-zone:hover,
+    #upload-zone.drag-over {
+      border-color: var(--accent);
+      background: #eff6ff;
+    }
+
+    #upload-zone p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #upload-zone .icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.35rem;
+    }
+
+    #upload-status {
+      font-size: 0.82rem;
+      min-height: 1.2em;
+      color: var(--text-muted);
+    }
+
+    #upload-status.success { color: #16a34a; }
+    #upload-status.error   { color: #dc2626; }
+
     /* ── Main layout ── */
     main {
       flex: 1;
@@ -91,7 +129,16 @@
   </header>
 
   <main>
-    <!-- upload zone, chat area, and input bar added in subsequent steps -->
+    <div id="upload-section">
+      <input type="file" id="file-input" accept=".pdf" hidden />
+      <div id="upload-zone">
+        <div class="icon">📄</div>
+        <p>Drop a PDF here or <strong>click to browse</strong></p>
+      </div>
+      <div id="upload-status"></div>
+    </div>
+
+    <!-- chat area and input bar added in subsequent steps -->
   </main>
 
 </body>
