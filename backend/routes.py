@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from ai.pipelines.rag import answer, ingest_pdf
-from ai.retrieval.retriever import collection_count, list_sources
+from ai.retrieval.retriever import collection_count, delete_source, list_sources
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,13 @@ def health():
 def documents():
     """List all ingested document names."""
     return {"documents": list_sources()}
+
+
+@app.delete("/documents/{filename}")
+def delete_document(filename: str):
+    """Remove all chunks for the given document from the collection."""
+    count = delete_source(filename)
+    return {"filename": filename, "chunks_deleted": count}
 
 
 @app.post("/ingest", response_model=IngestResponse)
