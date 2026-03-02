@@ -165,11 +165,10 @@
     #input-bar {
       background: var(--surface);
       border-top: 1px solid var(--border);
-      padding: 0.85rem 1.25rem;
+      padding: 0.85rem 0;
       display: flex;
       gap: 0.6rem;
       flex-shrink: 0;
-      margin: 0 -1.25rem;
     }
 
     #question-input {
@@ -252,12 +251,11 @@
     </div>
 
     <div id="chat"></div>
-  </main>
 
-  <div id="input-bar">
-    <input id="question-input" type="text" placeholder="Ask a question about your documents…" autocomplete="off" />
-    <button id="ask-btn" type="button">Ask →</button>
-  </div>
+    <div id="input-bar">
+      <input id="question-input" type="text" placeholder="Ask a question about your documents…" autocomplete="off" />
+      <button id="ask-btn" type="button">Ask →</button>
+    </div>
   </main>
 
 <script>
