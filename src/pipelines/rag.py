@@ -1,0 +1,155 @@
+"""End-to-end RAG pipeline: ingest PDFs and answer questions."""
+
+import logging
+from pathlib import Path
+
+from openai import OpenAI
+
+from src.config import settings
+from src.ingestion.chunker import chunk_pages
+from src.ingestion.embedder import embed_chunks, embed_texts
+from src.ingestion.loader import load_pdf, load_pdfs_from_dir
+from src.retrieval.retriever import add_chunks, retrieve
+
+logger = logging.getLogger(__name__)
+
+_openai_client: OpenAI | None = None
+
+SYSTEM_PROMPT = """You are a precise document assistant. Answer questions using only the provided context.
+If the answer is not in the context, say "I don't have enough information in the provided documents to answer that."
+Always cite your sources by mentioning the document name and page number."""
+
+RAG_PROMPT_TEMPLATE = """CONTEXT:
+{context}
+
+QUESTION:
+{question}
+
+INSTRUCTIONS:
+Answer using only the context above. Cite sources as (source, page N). If the answer is not in the context, say so."""
+
+
+def _get_openai_client() -> OpenAI:
+    global _openai_client
+    if _openai_client is None:
+        _openai_client = OpenAI(api_key=settings.openai_api_key)
+    return _openai_client
+
+
+def _generate_hypothetical_answer(question: str) -> str:
+    """
+    HyDE: generate a hypothetical document passage that would answer the question.
+
+    Embedding this passage instead of the raw question dramatically improves
+    retrieval because the generated text uses the same vocabulary as the document.
+    Uses gpt-4o-mini to keep this step cheap and fast.
+    """
+    client = _get_openai_client()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        max_tokens=256,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Write a concise, factual passage from a technical document that directly "
+                    "answers the given question. Use formal, document-like language. "
+                    "Do not say 'Based on' or reference yourself."
+                ),
+            },
+            {"role": "user", "content": question},
+        ],
+    )
+    hypothetical = response.choices[0].message.content
+    logger.info("HyDE passage (first 120 chars): %s", hypothetical[:120])
+    return hypothetical
+
+
+def ingest_pdf(path: str | Path) -> int:
+    """
+    Load, chunk, embed, and store a single PDF.
+
+    Returns:
+        number of chunks stored
+    """
+    logger.info("Ingesting %s", path)
+    pages = load_pdf(path)
+    chunks = chunk_pages(pages)
+    chunks = embed_chunks(chunks)
+    add_chunks(chunks)
+    return len(chunks)
+
+
+def ingest_directory(directory: str | Path) -> int:
+    """Ingest all PDFs from a directory. Returns total chunks stored."""
+    pages = load_pdfs_from_dir(directory)
+    chunks = chunk_pages(pages)
+    chunks = embed_chunks(chunks)
+    add_chunks(chunks)
+    return len(chunks)
+
+
+def answer(question: str) -> dict:
+    """
+    Answer a question using retrieved document context.
+
+    Args:
+        question — natural language question
+
+    Returns:
+        {
+            "answer": str,
+            "sources": list[dict],   # retrieved chunks with metadata and scores
+            "context_found": bool,
+        }
+    """
+    logger.info("Query: %s", question)
+
+    # 1. HyDE: embed a hypothetical answer rather than the raw question
+    hypothetical = _generate_hypothetical_answer(question)
+    query_embedding = embed_texts([hypothetical])[0]
+
+    # 2. Retrieve relevant chunks (hybrid dense + BM25, keyed on original question)
+    retrieved = retrieve(query_embedding, query_text=question)
+
+    if not retrieved:
+        logger.warning("No relevant context found for query")
+        return {
+            "answer": "I don't have enough information in the provided documents to answer that.",
+            "sources": [],
+            "context_found": False,
+        }
+
+    # 3. Build context block with citations
+    context_lines = []
+    for i, chunk in enumerate(retrieved, 1):
+        meta = chunk["metadata"]
+        context_lines.append(
+            f"[{i}] Source: {meta['source']}, Page {meta['page']}\n{chunk['text']}"
+        )
+    context = "\n\n---\n\n".join(context_lines)
+
+    # 4. Generate answer with OpenAI
+    prompt = RAG_PROMPT_TEMPLATE.format(context=context, question=question)
+    client = _get_openai_client()
+
+    response = client.chat.completions.create(
+        model=settings.llm_model,
+        max_tokens=1024,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+    )
+
+    answer_text = response.choices[0].message.content
+    logger.info("Answer generated (%d chars)", len(answer_text))
+
+    return {
+        "answer": answer_text,
+        "sources": [
+            {"source": c["metadata"]["source"], "page": c["metadata"]["page"], "score": round(c["score"], 3)}
+            for c in retrieved
+        ],
+        "context_found": True,
+    }
