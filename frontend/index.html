@@ -201,6 +201,22 @@
     #ask-btn:hover:not(:disabled) { background: var(--accent-hover); }
     #ask-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ── Typing indicator ── */
+    .typing-dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      margin: 0 2px;
+      animation: fade 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes fade {
+      0%, 80%, 100% { opacity: 0.25; }
+      40%           { opacity: 1; }
+    }
+
     /* ── Main layout ── */
     main {
       flex: 1;
@@ -305,6 +321,12 @@
 
   askBtn.addEventListener('click', submitQuestion);
 
+  function setLoading(on) {
+    questionInput.disabled = on;
+    askBtn.disabled = on;
+    askBtn.textContent = on ? '…' : 'Ask →';
+  }
+
   function appendBubble(role, html) {
     const div = document.createElement('div');
     div.className = `bubble ${role}`;
@@ -321,6 +343,11 @@
     questionInput.value = '';
     appendBubble('user', `<div class="sender">You</div>${escHtml(question)}`);
 
+    setLoading(true);
+    const typingBubble = appendBubble('ai',
+      `<div class="sender">AI</div><div class="typing-dots"><span></span><span></span><span></span></div>`
+    );
+
     try {
       const res = await fetch(`${API}/ask`, {
         method: 'POST',
@@ -330,6 +357,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Request failed');
 
+      typingBubble.remove();
       let html = `<div class="sender">AI</div>${escHtml(data.answer)}`;
       if (data.context_found && data.sources.length) {
         const tags = data.sources
@@ -339,7 +367,10 @@
       }
       appendBubble('ai', html);
     } catch (err) {
+      typingBubble.remove();
       appendBubble('ai', `<div class="sender">AI</div><em style="color:#dc2626">${escHtml(err.message)}</em>`);
+    } finally {
+      setLoading(false);
     }
   }
 
