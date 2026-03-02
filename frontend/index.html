@@ -80,10 +80,27 @@
       background: var(--ai-bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0.2rem 0.55rem;
+      padding: 0.2rem 0.4rem 0.2rem 0.55rem;
       color: var(--text);
       font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
     }
+
+    #doc-list-section .doc-tag .remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    #doc-list-section .doc-tag .remove-btn:hover { color: #dc2626; }
 
     #doc-list-section .empty-hint {
       font-style: italic;
@@ -404,6 +421,16 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  async function deleteDoc(filename) {
+    try {
+      const res = await fetch(`${API}/documents/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
+      refreshDocuments();
+    } catch (err) {
+      alert(`Could not remove ${filename}: ${err.message}`);
+    }
+  }
+
   async function refreshDocuments() {
     try {
       const res = await fetch(`${API}/documents`);
@@ -419,7 +446,9 @@
       if (docs.length === 0) {
         section.innerHTML = '<span class="empty-hint">No documents uploaded yet.</span>';
       } else {
-        section.innerHTML = docs.map(d => `<span class="doc-tag">📄 ${escHtml(d)}</span>`).join('');
+        section.innerHTML = docs.map(d =>
+          `<span class="doc-tag">📄 ${escHtml(d)}<button class="remove-btn" type="button" title="Remove" onclick="deleteDoc('${escHtml(d)}')">✕</button></span>`
+        ).join('');
       }
     } catch {
       document.getElementById('chunk-count').textContent = 'unavailable';
