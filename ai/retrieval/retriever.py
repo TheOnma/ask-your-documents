@@ -180,3 +180,23 @@ def list_sources() -> list[str]:
         return []
     result = collection.get(include=["metadatas"])
     return sorted({m["source"] for m in result["metadatas"] if m.get("source")})
+
+
+def delete_source(source: str) -> int:
+    """
+    Delete all chunks for the given source document from ChromaDB and BM25 corpus.
+
+    Returns:
+        number of chunks deleted
+    """
+    global _bm25_corpus, _bm25_index
+    collection = _get_collection()
+    result = collection.get(where={"source": source}, include=[])
+    ids = result["ids"]
+    if ids:
+        collection.delete(ids=ids)
+        _bm25_corpus = [(id_, text, meta) for id_, text, meta in _bm25_corpus
+                        if meta.get("source") != source]
+        _bm25_index = None
+        logger.info("Deleted %d chunks for source '%s'", len(ids), source)
+    return len(ids)
