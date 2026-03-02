@@ -2,10 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ask Your Documents</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --border: #e2e5ea;
+      --text: #1a1d23;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --user-bg: #2563eb;
+      --user-text: #ffffff;
+      --ai-bg: #f1f5f9;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: var(--shadow);
+    }
+
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    #chunk-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    #chunk-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 0;
+      gap: 1rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>Ask Your Documents</h1>
-  <p>Frontend coming soon.</p>
+
+  <header>
+    <h1>Ask Your Documents</h1>
+    <div id="chunk-badge">
+      <span class="dot"></span>
+      <span id="chunk-count">— chunks</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- upload zone, chat area, and input bar added in subsequent steps -->
+  </main>
+
 </body>
 </html>
