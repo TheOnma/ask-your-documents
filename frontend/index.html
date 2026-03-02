@@ -66,6 +66,29 @@
       background: #22c55e;
     }
 
+    /* ── Document list ── */
+    #doc-list-section {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      min-height: 1.4em;
+    }
+
+    #doc-list-section .doc-tag {
+      background: var(--ai-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.2rem 0.55rem;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    #doc-list-section .empty-hint {
+      font-style: italic;
+    }
+
     /* ── Upload zone ── */
     #upload-zone {
       border: 2px dashed var(--border);
@@ -236,7 +259,7 @@
     <h1>Ask Your Documents</h1>
     <div id="chunk-badge">
       <span class="dot"></span>
-      <span id="chunk-count">— chunks</span>
+      <span id="chunk-count">— documents</span>
     </div>
   </header>
 
@@ -248,6 +271,9 @@
         <p>Drop a PDF here or <strong>click to browse</strong></p>
       </div>
       <div id="upload-status"></div>
+    </div>
+    <div id="doc-list-section">
+      <span class="empty-hint">No documents uploaded yet.</span>
     </div>
 
     <div id="chat"></div>
@@ -299,7 +325,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Upload failed');
       setUploadStatus(`✓ ${data.filename} — ${data.chunks_stored} chunks stored`, 'success');
-      refreshChunkCount();
+      refreshDocuments();
     } catch (err) {
       setUploadStatus(`✗ ${err.message}`, 'error');
     } finally {
@@ -378,11 +404,23 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  async function refreshChunkCount() {
+  async function refreshDocuments() {
     try {
-      const res = await fetch(`${API}/health`);
+      const res = await fetch(`${API}/documents`);
       const data = await res.json();
-      document.getElementById('chunk-count').textContent = `${data.total_chunks} chunks`;
+      const docs = data.documents || [];
+
+      // Update header badge
+      document.getElementById('chunk-count').textContent =
+        docs.length === 1 ? '1 document' : `${docs.length} documents`;
+
+      // Update document list
+      const section = document.getElementById('doc-list-section');
+      if (docs.length === 0) {
+        section.innerHTML = '<span class="empty-hint">No documents uploaded yet.</span>';
+      } else {
+        section.innerHTML = docs.map(d => `<span class="doc-tag">📄 ${escHtml(d)}</span>`).join('');
+      }
     } catch {
       document.getElementById('chunk-count').textContent = 'unavailable';
     }
@@ -396,9 +434,9 @@
     }
   });
 
-  // Greet on load and fetch chunk count
+  // Greet on load and fetch document list
   appendBubble('ai', '<div class="sender">AI</div>Hello! Upload a PDF and ask me anything about it.');
-  refreshChunkCount();
+  refreshDocuments();
 </script>
 </body>
 </html>
