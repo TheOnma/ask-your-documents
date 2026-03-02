@@ -141,5 +141,69 @@
     <!-- chat area and input bar added in subsequent steps -->
   </main>
 
+<script>
+  const API = 'http://localhost:8000';
+
+  // ── Upload logic ──
+  const uploadZone = document.getElementById('upload-zone');
+  const fileInput  = document.getElementById('file-input');
+  const uploadStatus = document.getElementById('upload-status');
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+  });
+
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) uploadFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) uploadFile(fileInput.files[0]);
+  });
+
+  async function uploadFile(file) {
+    if (!file.name.endsWith('.pdf')) {
+      setUploadStatus('Only PDF files are supported.', 'error');
+      return;
+    }
+    setUploadStatus('Uploading…', '');
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      const res = await fetch(`${API}/ingest`, { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Upload failed');
+      setUploadStatus(`✓ ${data.filename} — ${data.chunks_stored} chunks stored`, 'success');
+      refreshChunkCount();
+    } catch (err) {
+      setUploadStatus(`✗ ${err.message}`, 'error');
+    } finally {
+      fileInput.value = '';
+    }
+  }
+
+  function setUploadStatus(msg, type) {
+    uploadStatus.textContent = msg;
+    uploadStatus.className = type;
+  }
+
+  async function refreshChunkCount() {
+    try {
+      const res = await fetch(`${API}/health`);
+      const data = await res.json();
+      document.getElementById('chunk-count').textContent = `${data.total_chunks} chunks`;
+    } catch {
+      document.getElementById('chunk-count').textContent = 'unavailable';
+    }
+  }
+</script>
 </body>
 </html>
