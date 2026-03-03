@@ -7,7 +7,8 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ai.pipelines.rag import answer, ingest_pdf
+from ai.ingestion.loader import SUPPORTED_EXTENSIONS
+from ai.pipelines.rag import answer, ingest_document
 from ai.retrieval.retriever import collection_count, delete_source, list_sources
 
 logger = logging.getLogger(__name__)
@@ -67,15 +68,18 @@ def delete_document(filename: str):
 
 @app.post("/ingest", response_model=IngestResponse)
 async def ingest(file: UploadFile):
-    """Upload and ingest a PDF document."""
-    if not file.filename or not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    """Upload and ingest a document (PDF, DOCX, or TXT)."""
+    from pathlib import Path as _Path
+    ext = _Path(file.filename or "").suffix.lower()
+    if not file.filename or ext not in SUPPORTED_EXTENSIONS:
+        supported = ", ".join(sorted(SUPPORTED_EXTENSIONS))
+        raise HTTPException(status_code=400, detail=f"Unsupported file type. Supported: {supported}")
 
     tmp_path = Path(f"/tmp/{file.filename}")
     try:
         content = await file.read()
         tmp_path.write_bytes(content)
-        chunks_stored = ingest_pdf(tmp_path)
+        chunks_stored = ingest_document(tmp_path)
     except Exception as e:
         logger.error("Ingestion failed for %s: %s", file.filename, e)
         raise HTTPException(status_code=500, detail=str(e))
