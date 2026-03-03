@@ -5,11 +5,14 @@ export default function Sidebar({ documents, onUpload, onDelete }) {
   const [dragOver, setDragOver] = useState(false)
   const [status, setStatus] = useState({ text: '', type: '' })
 
+  const ACCEPTED = ['.pdf', '.docx', '.txt']
+
   function handleFiles(files) {
     const file = files[0]
     if (!file) return
-    if (!file.name.endsWith('.pdf')) {
-      setStatus({ text: 'Only PDF files are supported.', type: 'error' })
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
+    if (!ACCEPTED.includes(ext)) {
+      setStatus({ text: 'Supported formats: PDF, DOCX, TXT.', type: 'error' })
       return
     }
     setStatus({ text: 'Uploading…', type: '' })
@@ -23,7 +26,7 @@ export default function Sidebar({ documents, onUpload, onDelete }) {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf"
+          accept=".pdf,.docx,.txt"
           hidden
           onChange={e => { if (e.target.files[0]) handleFiles(e.target.files); e.target.value = '' }}
         />
@@ -37,7 +40,8 @@ export default function Sidebar({ documents, onUpload, onDelete }) {
         >
           <div className="text-3xl mb-2">📄</div>
           <p className="text-sm text-gray-500">
-            Drop a PDF here or <strong className="text-gray-700">click to browse</strong>
+            Drop a file here or <strong className="text-gray-700">click to browse</strong>
+            <br /><span className="text-[0.7rem] text-gray-400">PDF, DOCX, TXT</span>
           </p>
         </div>
         <p className={`text-xs mt-2 min-h-[1.25rem] ${status.type === 'error' ? 'text-red-500' : status.type === 'success' ? 'text-green-600' : 'text-gray-400'}`}>
