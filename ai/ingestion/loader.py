@@ -1,4 +1,4 @@
-"""PDF document loader. Extracts text page-by-page, preserving source metadata."""
+"""Document loaders for PDF, DOCX, and TXT files. Extracts text preserving source metadata."""
 
 import logging
 from pathlib import Path
@@ -6,6 +6,29 @@ from pathlib import Path
 from pypdf import PdfReader
 
 logger = logging.getLogger(__name__)
+
+
+def load_txt(path: str | Path) -> list[dict]:
+    """
+    Load a plain-text file and return it as a single page dict.
+
+    Args:
+        path — path to the .txt file
+
+    Returns:
+        list of {"text": str, "metadata": {"source": str, "page": int}}
+    """
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"Text file not found: {path}")
+
+    text = path.read_text(encoding="utf-8", errors="replace").strip()
+    if not text:
+        logger.warning("%s is empty", path.name)
+        return []
+
+    logger.info("Loaded text file %s (%d chars)", path.name, len(text))
+    return [{"text": text, "metadata": {"source": path.name, "page": 1}}]
 
 
 def load_pdf(path: str | Path) -> list[dict]:
