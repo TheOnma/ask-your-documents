@@ -24,7 +24,16 @@ export default function App() {
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Documents</h2>
           </div>
         </aside>
+
+        {/* Main chat column */}
+        <main className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+        </main>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-red-600 text-white/90 text-center py-2 text-xs flex-shrink-0">
+        Made with love ❤️
+      </footer>
     </div>
   )
 }
