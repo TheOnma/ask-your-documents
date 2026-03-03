@@ -1,7 +1,44 @@
 import { useState, useEffect } from 'react'
+import { listDocuments, deleteDocument, ingestPDF } from './api.js'
+import Sidebar from './components/Sidebar.jsx'
 
 export default function App() {
   const [documents, setDocuments] = useState([])
+  const [messages, setMessages] = useState([
+    { role: 'ai', text: 'Hello! Upload a PDF and ask me anything about it.', sources: [], contextFound: true }
+  ])
+
+  useEffect(() => {
+    refreshDocuments()
+  }, [])
+
+  async function refreshDocuments() {
+    try {
+      const docs = await listDocuments()
+      setDocuments(docs)
+    } catch {
+      // silently ignore on load
+    }
+  }
+
+  async function handleUpload(file, setStatus) {
+    try {
+      const data = await ingestPDF(file)
+      setStatus({ text: `✓ ${data.filename} — ${data.chunks_stored} chunks stored`, type: 'success' })
+      refreshDocuments()
+    } catch (err) {
+      setStatus({ text: `✗ ${err.message}`, type: 'error' })
+    }
+  }
+
+  async function handleDelete(filename) {
+    try {
+      await deleteDocument(filename)
+      refreshDocuments()
+    } catch (err) {
+      alert(`Could not remove ${filename}: ${err.message}`)
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -19,10 +56,11 @@ export default function App() {
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-y-auto">
+        <aside className="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
           <div className="p-4 border-b border-gray-200">
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Documents</h2>
           </div>
+          <Sidebar documents={documents} onUpload={handleUpload} onDelete={handleDelete} />
         </aside>
 
         {/* Main chat column */}
