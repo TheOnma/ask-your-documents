@@ -31,6 +31,43 @@ def load_txt(path: str | Path) -> list[dict]:
     return [{"text": text, "metadata": {"source": path.name, "page": 1}}]
 
 
+def load_docx(path: str | Path) -> list[dict]:
+    """
+    Load a Word document (.docx) and return its paragraphs grouped into pseudo-pages.
+
+    Every 40 non-empty paragraphs are treated as one page so that the chunker
+    receives reasonably-sized text blocks. Documents with fewer than 40 paragraphs
+    are returned as a single page.
+
+    Args:
+        path — path to the .docx file
+
+    Returns:
+        list of {"text": str, "metadata": {"source": str, "page": int}}
+    """
+    from docx import Document  # lazy import so pypdf isn't penalised if docx absent
+
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"DOCX file not found: {path}")
+
+    doc = Document(str(path))
+    paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+
+    if not paragraphs:
+        logger.warning("%s has no extractable text", path.name)
+        return []
+
+    PAGE_SIZE = 40
+    pages = []
+    for page_num, start in enumerate(range(0, len(paragraphs), PAGE_SIZE), 1):
+        text = "\n".join(paragraphs[start : start + PAGE_SIZE])
+        pages.append({"text": text, "metadata": {"source": path.name, "page": page_num}})
+
+    logger.info("Loaded %d pseudo-pages from %s", len(pages), path.name)
+    return pages
+
+
 def load_pdf(path: str | Path) -> list[dict]:
     """
     Load a PDF and return a list of page dicts.
