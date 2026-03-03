@@ -13,6 +13,33 @@ function UserBubble({ text }) {
   )
 }
 
+function AIBubble({ text, sources, contextFound }) {
+  return (
+    <div className="flex justify-start">
+      <div className="max-w-[75%]">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">AI</p>
+        <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm leading-relaxed text-gray-800 shadow-sm">
+          {contextFound === false
+            ? <em className="text-gray-400">{text}</em>
+            : text}
+          {sources && sources.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Sources</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sources.map((s, i) => (
+                  <span key={i} className="bg-gray-50 border border-gray-200 rounded-md px-2 py-0.5 text-[0.72rem] text-gray-500">
+                    {s.source} p.{s.page} ({s.score})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Chat({ messages, loading }) {
   const bottomRef = useRef(null)
 
@@ -21,7 +48,7 @@ export default function Chat({ messages, loading }) {
       {messages.map((msg, i) => (
         msg.role === 'user'
           ? <UserBubble key={i} text={msg.text} />
-          : null
+          : <AIBubble key={i} text={msg.text} sources={msg.sources} contextFound={msg.contextFound} />
       ))}
       <div ref={bottomRef} />
     </div>
