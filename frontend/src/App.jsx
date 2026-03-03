@@ -15,6 +15,16 @@ export default function App() {
           </span>
         </div>
       </header>
+
+      {/* Body */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <aside className="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-y-auto">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Documents</h2>
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }
