@@ -65,7 +65,7 @@ export default function App() {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <header className="bg-red-600 text-white px-6 h-14 flex items-center flex-shrink-0">
+      <header className="bg-red-600 text-white px-6 h-14 flex items-center justify-center flex-shrink-0">
         <h1 className="font-semibold text-base tracking-tight">Ask Your Documents</h1>
       </header>
 

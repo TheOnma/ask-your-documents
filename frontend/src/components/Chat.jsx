@@ -13,11 +13,11 @@ function UserBubble({ text }) {
   )
 }
 
-function AIBubble({ text, sources, contextFound }) {
+function RoseBubble({ text, sources, contextFound }) {
   return (
     <div className="flex justify-start">
       <div className="max-w-[75%]">
-        <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">AI</p>
+        <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">Rose</p>
         <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm leading-relaxed text-gray-800 shadow-sm">
           {contextFound === false
             ? <em className="text-gray-400">{text}</em>
@@ -52,12 +52,12 @@ export default function Chat({ messages, loading }) {
       {messages.map((msg, i) => (
         msg.role === 'user'
           ? <UserBubble key={i} text={msg.text} />
-          : <AIBubble key={i} text={msg.text} sources={msg.sources} contextFound={msg.contextFound} />
+          : <RoseBubble key={i} text={msg.text} sources={msg.sources} contextFound={msg.contextFound} />
       ))}
       {loading && (
         <div className="flex justify-start">
           <div className="max-w-[75%]">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">AI</p>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">Rose</p>
             <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
               {[0, 1, 2].map(i => (
                 <span
