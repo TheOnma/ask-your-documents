@@ -50,6 +50,22 @@ export default function Chat({ messages, loading }) {
           ? <UserBubble key={i} text={msg.text} />
           : <AIBubble key={i} text={msg.text} sources={msg.sources} contextFound={msg.contextFound} />
       ))}
+      {loading && (
+        <div className="flex justify-start">
+          <div className="max-w-[75%]">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-gray-400 mb-1">AI</p>
+            <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex gap-1 items-center">
+              {[0, 1, 2].map(i => (
+                <span
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <div ref={bottomRef} />
     </div>
   )
