@@ -4,10 +4,12 @@ Entry points:
   # Start the API server
   python main.py serve
 
-  # Ingest a single PDF
+  # Ingest a single document (PDF, DOCX, or TXT)
   python main.py ingest path/to/doc.pdf
+  python main.py ingest path/to/doc.docx
+  python main.py ingest path/to/doc.txt
 
-  # Ingest all PDFs in a directory
+  # Ingest all supported documents in a directory
   python main.py ingest path/to/documents/
 
   # Ask a question from the command line
@@ -33,13 +35,13 @@ def serve():
 
 def ingest(path: str):
     from pathlib import Path
-    from ai.pipelines.rag import ingest_directory, ingest_pdf
+    from ai.pipelines.rag import ingest_directory, ingest_document
     p = Path(path)
     if p.is_dir():
         n = ingest_directory(p)
         print(f"Ingested {n} chunks from directory {path}")
     else:
-        n = ingest_pdf(p)
+        n = ingest_document(p)
         print(f"Ingested {n} chunks from {path}")
 
 
