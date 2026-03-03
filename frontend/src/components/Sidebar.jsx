@@ -44,6 +44,23 @@ export default function Sidebar({ documents, onUpload, onDelete }) {
           {status.text}
         </p>
       </div>
+
+      {/* Document list */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Uploaded</p>
+        {documents.length === 0 ? (
+          <p className="text-xs text-gray-400 italic">No documents yet.</p>
+        ) : (
+          <ul className="space-y-1">
+            {documents.map(doc => (
+              <li key={doc} className="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                <span className="text-base">📄</span>
+                <span className="flex-1 truncate text-xs">{doc}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }
