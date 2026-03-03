@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
-import { listDocuments, deleteDocument, ingestPDF } from './api.js'
+import { listDocuments, deleteDocument, ingestPDF, askQuestion } from './api.js'
 import Sidebar from './components/Sidebar.jsx'
+import Chat from './components/Chat.jsx'
+import InputBar from './components/InputBar.jsx'
 
 export default function App() {
   const [documents, setDocuments] = useState([])
   const [messages, setMessages] = useState([
     { role: 'ai', text: 'Hello! Upload a PDF and ask me anything about it.', sources: [], contextFound: true }
   ])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     refreshDocuments()
@@ -40,6 +43,25 @@ export default function App() {
     }
   }
 
+  async function handleAsk(question) {
+    setMessages(prev => [...prev, { role: 'user', text: question }])
+    setLoading(true)
+    try {
+      const data = await askQuestion(question)
+      setMessages(prev => [
+        ...prev,
+        { role: 'ai', text: data.answer, sources: data.sources, contextFound: data.context_found }
+      ])
+    } catch (err) {
+      setMessages(prev => [
+        ...prev,
+        { role: 'ai', text: err.message, sources: [], contextFound: false }
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -65,6 +87,8 @@ export default function App() {
 
         {/* Main chat column */}
         <main className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+          <Chat messages={messages} loading={loading} />
+          <InputBar onAsk={handleAsk} loading={loading} />
         </main>
       </div>
 
