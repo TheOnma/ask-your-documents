@@ -13,3 +13,7 @@ data/documents/
 evals/results.json
 .venv/
 venv/
+
+# Frontend (React / Vite)
+frontend/node_modules/
+frontend/dist/
