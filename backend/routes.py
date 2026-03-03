@@ -7,9 +7,9 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ai.ingestion.loader import SUPPORTED_EXTENSIONS
-from ai.pipelines.rag import answer, ingest_document
-from ai.retrieval.retriever import collection_count, delete_source, list_sources
+from rag.ingestion.loader import SUPPORTED_EXTENSIONS
+from rag.pipelines.rag import answer, ingest_document
+from rag.retrieval.retriever import collection_count, delete_source, list_sources
 
 logger = logging.getLogger(__name__)
 
