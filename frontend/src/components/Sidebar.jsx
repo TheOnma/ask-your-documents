@@ -56,6 +56,11 @@ export default function Sidebar({ documents, onUpload, onDelete }) {
               <li key={doc} className="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
                 <span className="text-base">📄</span>
                 <span className="flex-1 truncate text-xs">{doc}</span>
+                <button
+                  onClick={() => onDelete(doc)}
+                  className="text-gray-400 hover:text-red-500 transition-colors text-xs leading-none"
+                  title="Remove document"
+                >✕</button>
               </li>
             ))}
           </ul>
