@@ -35,7 +35,7 @@ def serve():
 
 def ingest(path: str):
     from pathlib import Path
-    from ai.pipelines.rag import ingest_directory, ingest_document
+    from rag.pipelines.rag import ingest_directory, ingest_document
     p = Path(path)
     if p.is_dir():
         n = ingest_directory(p)
@@ -46,11 +46,11 @@ def ingest(path: str):
 
 
 def ask(question: str, show_context: bool = False):
-    from ai.pipelines.rag import answer
+    from rag.pipelines.rag import answer
     result = answer(question)
 
     if show_context and result["sources"]:
-        from ai.retrieval.retriever import _get_collection
+        from rag.retrieval.retriever import _get_collection
         collection = _get_collection()
         print("\n--- Retrieved Context ---")
         for i, source in enumerate(result["sources"], 1):
