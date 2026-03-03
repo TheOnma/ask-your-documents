@@ -8,7 +8,7 @@ from openai import OpenAI
 from ai.config import settings
 from ai.ingestion.chunker import chunk_pages
 from ai.ingestion.embedder import embed_chunks, embed_texts
-from ai.ingestion.loader import load_pdf, load_pdfs_from_dir
+from ai.ingestion.loader import load_document, load_documents_from_dir, load_pdf, load_pdfs_from_dir
 from ai.retrieval.retriever import add_chunks, retrieve
 
 logger = logging.getLogger(__name__)
@@ -65,24 +65,29 @@ def _generate_hypothetical_answer(question: str) -> str:
     return hypothetical
 
 
-def ingest_pdf(path: str | Path) -> int:
+def ingest_document(path: str | Path) -> int:
     """
-    Load, chunk, embed, and store a single PDF.
+    Load, chunk, embed, and store a single document (PDF, DOCX, or TXT).
 
     Returns:
         number of chunks stored
     """
     logger.info("Ingesting %s", path)
-    pages = load_pdf(path)
+    pages = load_document(path)
     chunks = chunk_pages(pages)
     chunks = embed_chunks(chunks)
     add_chunks(chunks)
     return len(chunks)
 
 
+def ingest_pdf(path: str | Path) -> int:
+    """Ingest a PDF. Kept for backward compatibility — delegates to ingest_document."""
+    return ingest_document(path)
+
+
 def ingest_directory(directory: str | Path) -> int:
-    """Ingest all PDFs from a directory. Returns total chunks stored."""
-    pages = load_pdfs_from_dir(directory)
+    """Ingest all supported documents from a directory. Returns total chunks stored."""
+    pages = load_documents_from_dir(directory)
     chunks = chunk_pages(pages)
     chunks = embed_chunks(chunks)
     add_chunks(chunks)
