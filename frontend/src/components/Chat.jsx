@@ -43,6 +43,10 @@ function AIBubble({ text, sources, contextFound }) {
 export default function Chat({ messages, loading }) {
   const bottomRef = useRef(null)
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, loading])
+
   return (
     <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
       {messages.map((msg, i) => (
