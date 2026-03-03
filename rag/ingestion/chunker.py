@@ -2,7 +2,7 @@
 
 import logging
 
-from ai.config import settings
+from rag.config import settings
 
 logger = logging.getLogger(__name__)
 

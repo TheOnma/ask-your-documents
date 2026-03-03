@@ -4,7 +4,7 @@ import logging
 
 from openai import OpenAI
 
-from ai.config import settings
+from rag.config import settings
 
 logger = logging.getLogger(__name__)
 
