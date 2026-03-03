@@ -103,8 +103,52 @@ def load_pdf(path: str | Path) -> list[dict]:
     return pages
 
 
+SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt"}
+
+
+def load_document(path: str | Path) -> list[dict]:
+    """
+    Load any supported document type and return a list of page dicts.
+
+    Dispatches to load_pdf(), load_docx(), or load_txt() based on file extension.
+    Raises ValueError for unsupported extensions.
+    """
+    path = Path(path)
+    ext = path.suffix.lower()
+    if ext == ".pdf":
+        return load_pdf(path)
+    if ext == ".docx":
+        return load_docx(path)
+    if ext == ".txt":
+        return load_txt(path)
+    raise ValueError(f"Unsupported file type '{ext}'. Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}")
+
+
+def load_documents_from_dir(directory: str | Path) -> list[dict]:
+    """Load all supported documents from a directory."""
+    directory = Path(directory)
+    all_pages = []
+    files = sorted(
+        f for f in directory.iterdir()
+        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+    )
+
+    if not files:
+        logger.warning("No supported documents found in %s", directory)
+        return []
+
+    for doc_path in files:
+        try:
+            all_pages.extend(load_document(doc_path))
+        except Exception as e:
+            logger.error("Failed to load %s: %s", doc_path.name, e)
+
+    logger.info("Loaded %d total pages from %d documents", len(all_pages), len(files))
+    return all_pages
+
+
 def load_pdfs_from_dir(directory: str | Path) -> list[dict]:
-    """Load all PDFs from a directory."""
+    """Load all PDFs from a directory. Kept for backward compatibility."""
     directory = Path(directory)
     all_pages = []
     pdf_files = sorted(directory.glob("*.pdf"))
